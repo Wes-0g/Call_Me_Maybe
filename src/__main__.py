@@ -1,44 +1,6 @@
-from json import load, dump, JSONDecodeError
 from argparse import ArgumentParser, Namespace
-from typing import Callable, List, Dict, Union
-try:
-    from pydantic import BaseModel, Field, model_validator, field_validator
-except ImportError:
-    print("pydantic is not installed. Please install it using pip.")
-    exit(1)
-
-
-class FuncDefParameter(BaseModel):
-    pass
-
-
-class FuncDefValidator(BaseModel):
-    name: str
-    description: str
-
-
-class FuncCallValidator(BaseModel):
-    prompt: str
-
-
-class JsonParser:
-
-    def __init__(self, args: Namespace) -> None:
-        self.args: Namespace = args
-
-    def parse(self) -> None:
-        self.func_def_parser()
-        self.func_call_parser()
-
-    def func_def_parser(self) -> None:
-        with open(self.args.functions_definition, 'r') as file:
-            func_def_json: List[
-                Dict[str, Union[str, Dict[str, str]]]
-            ] = load(file)
-
-    def func_call_parser(self) -> None:
-        with open(self.args.input, 'r') as file:
-            func_call_json: List[Dict[str, str]] = load(file)
+from typing import Callable, List
+from .parser import JsonParser, FuncDefValidator, FuncCallValidator
 
 
 def main() -> None:
@@ -56,7 +18,12 @@ def main() -> None:
 
     args: Namespace = arg_parser.parse_args()
     json_parser: JsonParser = JsonParser(args)
-    json_parser.parse()
+    func_def_list: List[FuncDefValidator] = json_parser.func_def_parser()
+    func_call_list: List[FuncCallValidator] = json_parser.func_call_parser()
+
+    print(func_def_list)
+    print()
+    print(func_call_list)
 
 
 if __name__ == "__main__":
