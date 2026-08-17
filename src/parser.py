@@ -7,7 +7,7 @@ try:
                           model_validator,
                           ValidationError,
                           ConfigDict)
-except ImportError:
+except ModuleNotFoundError:
     print("pydantic is not installed. Please install it using pip.")
     exit(1)
 
