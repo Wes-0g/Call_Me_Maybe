@@ -18,7 +18,7 @@ class ParserError(Exception):
         super().__init__(self.message)
 
 
-class ParamType(Enum):
+class ParamType(str, Enum):
     NUMBER = "number"
     STRING = "string"
     BOOLEAN = "boolean"
@@ -106,6 +106,9 @@ class JsonParser:
             return [FuncDefValidator(**item) for item in func_def_json]
         except ValidationError as e:
             raise ParserError(e)
+        except TypeError:
+            raise ParserError("Function definitions data must be "
+                              "a list of dictionaries.")
 
     def func_call_parser(self) -> List[FuncCallValidator]:
         try:
@@ -128,3 +131,6 @@ class JsonParser:
             return [FuncCallValidator(**item) for item in func_call_json]
         except ValidationError as e:
             raise ParserError(e)
+        except TypeError:
+            raise ParserError("Function calls data must be "
+                              "a list of dictionaries.")
