@@ -1,6 +1,7 @@
-from typing import Optional, List, Dict
+from typing import Optional, List, Dict, Set
 from llm_sdk import Small_LLM_Model
 from .parser import FuncDefValidator
+
 
 class TrieNode:
 
@@ -25,11 +26,19 @@ class Trie:
         curr.is_end_leaf = True
         curr.func_def = func_def
 
-    def trie_builder(self, func_defs: List[FuncDefValidator], llm: Small_LLM_Model) -> None:
+    def trie_builder(self, func_defs: List[FuncDefValidator],
+                     llm: Small_LLM_Model) -> None:
 
         for func_def in func_defs:
             ids = llm.encode(func_def.name)[0].tolist()
             self.insert(ids, func_def)
 
-    def some_shit(self) -> None:
-        pass
+    @staticmethod
+    def valid_next_ids_for_name(curr_node: TrieNode) -> Set[int]:
+        return set(key for key in curr_node.children.keys())
+
+    @staticmethod
+    def advance(token_id: int, curr_node: TrieNode) -> Optional[TrieNode]:
+        if token_id in curr_node.children:
+            return curr_node.children[token_id]
+        return None
