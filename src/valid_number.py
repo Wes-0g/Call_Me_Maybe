@@ -44,7 +44,7 @@ def is_valid_number(state: str, token_str: str) -> Optional[str]:
     return curr
 
 
-def build_number_from_vocab(vocab: Dict[str, int]) -> Dict[int, str]:
+def build_number_vocab(vocab: Dict[str, int]) -> Dict[int, str]:
     allowed_chars: str = "-0123456789."
     valid: Dict[int, str] = {}
 
