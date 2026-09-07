@@ -2,6 +2,7 @@ from json import load, JSONDecodeError
 from argparse import Namespace
 from typing import List, Dict, Tuple, Any
 from enum import Enum
+from llm_sdk import Small_LLM_Model
 try:
     from pydantic import (BaseModel,
                           model_validator,
@@ -134,3 +135,15 @@ class JsonParser:
         except TypeError:
             raise ParserError("Function calls data must be "
                               "a list of dictionaries.")
+
+
+def load_vocab(llm: Small_LLM_Model) -> Dict[str, int]:
+    try:
+        with open(llm.get_path_to_vocab_file()) as file:
+            return load(file)
+    except FileNotFoundError:
+        exit("Vocabulary file not found.")
+    except PermissionError:
+        exit("Vocabulary file not readable.")
+    except JSONDecodeError:
+        exit("Vocabulary file is not a valid JSON file.")
