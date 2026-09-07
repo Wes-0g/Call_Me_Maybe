@@ -1,4 +1,4 @@
-from typing import Optional, List, Dict, Set
+from typing import Optional, List, Dict, Set, Union
 from llm_sdk import Small_LLM_Model
 from .parser import FuncDefValidator
 
@@ -8,7 +8,7 @@ class TrieNode:
     def __init__(self) -> None:
         self.children: Dict[int, TrieNode] = {}
         self.is_end_leaf = False
-        self.func_def: Optional[FuncDefValidator] = None
+        self.func_def: Optional[Union[FuncDefValidator, str]] = None
 
 
 class Trie:
@@ -16,7 +16,8 @@ class Trie:
     def __init__(self) -> None:
         self.root = TrieNode()
 
-    def insert(self, ids: list[int], func_def: FuncDefValidator) -> None:
+    def insert(self, ids: list[int],
+               func_def: Union[FuncDefValidator, str]) -> None:
         curr = self.root
 
         for id_ in ids:
@@ -34,7 +35,7 @@ class Trie:
             self.insert(ids, func_def)
 
     @staticmethod
-    def valid_next_ids_for_name(curr_node: TrieNode) -> Set[int]:
+    def valid_next_ids(curr_node: TrieNode) -> Set[int]:
         return set(key for key in curr_node.children.keys())
 
     @staticmethod
