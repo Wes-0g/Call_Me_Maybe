@@ -1,6 +1,5 @@
 from typing import List, Set
 from math import inf
-from .parser import FuncDefValidator
 
 
 def logits_masking(logits: List[float], valid_token_ids: Set[int]) \
