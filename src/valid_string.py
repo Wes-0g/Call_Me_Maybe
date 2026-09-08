@@ -1,7 +1,8 @@
 from typing import Dict, Optional, Union
 
 
-def build_string_vocab(vocab: Dict[str, int]) -> Dict[str, Dict[int, Union[str, None]]]:
+def build_string_vocab(vocab: Dict[str, int]
+                       ) -> Dict[str, Dict[int, Union[str, None]]]:
     valid_vocab: Dict[str, Dict[int, Union[str, None]]] = {}
 
     for state in ['IN_STRING', "AFTER_BACKSLASH"]:
@@ -12,6 +13,7 @@ def build_string_vocab(vocab: Dict[str, int]) -> Dict[str, Dict[int, Union[str, 
         }
 
     return valid_vocab
+
 
 def string_state(state: str, char: str) -> Optional[str]:
     if state == "IN_STRING":
@@ -43,8 +45,8 @@ def valid_next_ids_for_string(vocab: Dict[str, int],
                               curr_state: str
                               ) -> Dict[int, Union[str, None]]:
 
-    valid: Dict[int, Union[str, None]] = {}
-
-    valid = build_string_vocab(vocab)[curr_state]
+    valid: Dict[
+        int, Union[str, None]
+    ] = build_string_vocab(vocab)[curr_state]
 
     return valid
