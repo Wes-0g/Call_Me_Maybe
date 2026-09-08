@@ -26,6 +26,7 @@ def build_output_entry(prompt: str,
         "parameters": params
     }
 
+
 def generate_params(llm: Small_LLM_Model,
                     curr_ids: List[int],
                     func_def: FuncDefValidator,
@@ -38,7 +39,9 @@ def generate_params(llm: Small_LLM_Model,
                     ) -> Dict[str, Any]:
 
     params_value: Dict[str, Union[float, str, bool]] = {}
-    params_items: List[Tuple[str, FuncDefParameter]] = list(func_def.parameters.items())
+    params_items: List[
+        Tuple[str, FuncDefParameter]
+    ] = list(func_def.parameters.items())
 
     for i, (param_name, param) in enumerate(params_items):
         prefix = f'"{param_name}": '
@@ -48,17 +51,18 @@ def generate_params(llm: Small_LLM_Model,
         curr_ids.extend(prefix_ids)
 
         if param.type == ParamType.STRING:
-            _, value = generate_string(llm, curr_ids, vocab, quote_id)
+            _, value = generate_string(llm, curr_ids, vocab, quote_id, 30)
         elif param.type == ParamType.NUMBER:
-            _, value = generate_number(llm, curr_ids, number_vocab, comma_ids + closing_ids)
+            _, value = generate_number(
+                llm, curr_ids, number_vocab, comma_ids + closing_ids)
         elif param.type == ParamType.BOOLEAN:
             _, value = generate_boolean(llm, curr_ids, bool_trie)
         else:
             raise ValueError(f"Invalid parameter type: {param.type}")
         params_value[param_name] = value
 
-        if i < len(params_items) -1:
-            curr_ids.extend(comma_ids)
+        # if i < len(params_items) - 1:
+        # curr_ids.extend(comma_ids)
 
     return params_value
 
