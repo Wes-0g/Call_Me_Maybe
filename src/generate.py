@@ -79,12 +79,13 @@ def generate_number(llm: Small_LLM_Model,
 def generate_string(llm: Small_LLM_Model,
                     curr_ids: List[int],
                     vocab: Dict[str, int],
-                    quote_token_ids: int) -> Tuple[List[int], str]:
+                    quote_token_ids: int,
+                    max_tokens: int) -> Tuple[List[int], str]:
 
     curr_state: str = "IN_STRING"
     generated_ids: List[int] = []
 
-    while True:
+    for _ in range(max_tokens):
         logits = llm.get_logits_from_input_ids(curr_ids)
         candidate_ids = valid_next_ids_for_string(vocab, curr_state)
 
@@ -102,10 +103,10 @@ def generate_string(llm: Small_LLM_Model,
         curr_state = candidate_ids[next_token]
         generated_ids.append(next_token)
         curr_ids.append(next_token)
-        if len(generated_ids) >= 3 and generated_ids[-1] == generated_ids[-2] == generated_ids[-3]:
-            break
 
-        print(f"state={curr_state}, len={len(curr_ids)}, token={llm.decode([next_token])!r}")
+        print(f"state={curr_state}, "
+              f"len={len(curr_ids)}, "
+              f"token={llm.decode([next_token])!r}")
 
     return generated_ids, llm.decode(generated_ids)
 
