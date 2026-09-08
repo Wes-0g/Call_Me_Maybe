@@ -1,3 +1,5 @@
+import json
+import os
 from argparse import ArgumentParser, Namespace, Action
 from sys import exit
 from llm_sdk import Small_LLM_Model
@@ -39,6 +41,10 @@ def main() -> None:
 
     result = constrained_decoding(llm, func_def_list, func_call_list)
 
+    ouput_dir = os.path.dirname(args.output)
+    os.makedirs(ouput_dir, exist_ok=True)
+    with open(args.output, "w") as f:
+        json.dump(result, f, indent=4)
 
 
 if __name__ == "__main__":
