@@ -1,15 +1,15 @@
 from json import load, JSONDecodeError
 from argparse import Namespace
-from typing import List, Dict, Tuple, Any
+from typing import List, Dict, Tuple, Any, cast
 from enum import Enum
-from llm_sdk import Small_LLM_Model
 try:
+    from llm_sdk import Small_LLM_Model
     from pydantic import (BaseModel,
                           model_validator,
                           ValidationError,
                           ConfigDict)
 except ModuleNotFoundError:
-    print("pydantic is not installed. Please install it using pip.")
+    print("llm_sdk or pydantic is not installed first.")
     exit(1)
 
 
@@ -23,6 +23,7 @@ class ParamType(str, Enum):
     NUMBER = "number"
     STRING = "string"
     BOOLEAN = "boolean"
+    integer = "integer"
 
 
 class FuncDefParameter(BaseModel):
@@ -140,7 +141,7 @@ class JsonParser:
 def load_vocab(llm: Small_LLM_Model) -> Dict[str, int]:
     try:
         with open(llm.get_path_to_vocab_file()) as file:
-            return load(file)
+            return cast(Dict[str, int], load(file))
     except FileNotFoundError:
         exit("Vocabulary file not found.")
     except PermissionError:
