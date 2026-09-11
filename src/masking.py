@@ -1,5 +1,6 @@
 from typing import List, Set
 from math import inf
+import numpy as np
 
 
 def logits_masking(logits: List[float], valid_token_ids: Set[int]) \
@@ -11,5 +12,4 @@ def logits_masking(logits: List[float], valid_token_ids: Set[int]) \
 
 
 def chose_next_token(masked_logits: List[float]) -> int:
-    # return m_logits.index(max(m_logits))
-    return max(enumerate(masked_logits), key=lambda pair: pair[1])[0]
+    return int(np.argmax(masked_logits))
