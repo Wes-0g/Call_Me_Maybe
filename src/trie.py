@@ -36,10 +36,8 @@ class Trie:
 
     @staticmethod
     def valid_next_ids(curr_node: TrieNode) -> Set[int]:
-        return set(key for key in curr_node.children.keys())
+        return set(curr_node.children)
 
     @staticmethod
     def advance(token_id: int, curr_node: TrieNode) -> Optional[TrieNode]:
-        if token_id in curr_node.children:
-            return curr_node.children[token_id]
-        return None
+        return curr_node.children.get(token_id)
