@@ -2,14 +2,9 @@ from typing import Dict, Optional
 
 
 def number_state(state: str, char: str) -> str | None:
-    if state == "START":
-        if char == '-':
+    if state in ("START", "AFTER_MINUS"):
+        if char == '-' and state == 'START':
             return "AFTER_MINUS"
-        if char == '0':
-            return "INT_ZERO"
-        if char in '123456789':
-            return "INT_NONZERO"
-    elif state == "AFTER_MINUS":
         if char == '0':
             return "INT_ZERO"
         if char in '123456789':
@@ -22,10 +17,7 @@ def number_state(state: str, char: str) -> str | None:
             return "INT_NONZERO"
         if char == '.':
             return "AFTER_DOT"
-    elif state == "AFTER_DOT":
-        if char in '0123456789':
-            return "FRAC_DIGIT"
-    elif state == "FRAC_DIGIT":
+    elif state in ("AFTER_DOT", "FRAC_DIGIT"):
         if char in '0123456789':
             return "FRAC_DIGIT"
 
@@ -58,11 +50,15 @@ def build_number_vocab(vocab: Dict[str, int]) -> Dict[int, str]:
 
 
 def valid_next_ids_for_number(valid_vocab: Dict[int, str],
-                              curr_state: str) -> Dict[int, str]:
+                              curr_state: str,
+                              integer_only: bool = False
+                              ) -> Dict[int, str]:
 
     valid: Dict[int, str] = {}
 
     for token_id, token_str in valid_vocab.items():
+        if integer_only and "." in token_str:
+            continue
         state = is_valid_number(curr_state, token_str)
         if state is not None:
             valid[token_id] = state
