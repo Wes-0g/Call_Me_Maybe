@@ -1,13 +1,12 @@
 import json
-import os
-from argparse import ArgumentParser, Namespace, Action
-from sys import exit
+from argparse import ArgumentParser, Action, Namespace
+from typing import Callable, List, Dict, Any
+from pathlib import Path
 from llm_sdk import Small_LLM_Model
-from typing import Callable, List
 from .parser import (JsonParser,
+                     ParserError,
                      FuncDefValidator,
-                     FuncCallValidator,
-                     ParserError)
+                     FuncCallValidator)
 from .output_builder import constrained_decoding
 
 
@@ -37,21 +36,15 @@ def main() -> None:
         exit(f"{e}")
 
     llm: Small_LLM_Model = Small_LLM_Model()
-    print(f"\n{'='*92}\n")
 
-    result = constrained_decoding(llm, func_def_list, func_call_list)
+    results: List[
+        Dict[str, Any]
+    ] = constrained_decoding(llm, func_def_list, func_call_list)
 
-    ouput_dir = os.path.dirname(args.output)
-    os.makedirs(ouput_dir, exist_ok=True)
-    with open(args.output, "w") as f:
-        json.dump(result, f, indent=4)
+    output = Path(args.output)
+    output.parent.mkdir(parents=True, exist_ok=True)
+    output.write_text(json.dumps(results, indent=4), encoding='utf-8')
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     main()
-
-
-'''
-uv run python -m src [--functions_definition <function_definition_file>]
-                     [--input <input_file>] [--output <output_file>]
-'''
