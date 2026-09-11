@@ -1,2 +1,2 @@
 [flake8]
-exclude = llm_sdk
+exclude = llm_sdk, .venv, moulinette
