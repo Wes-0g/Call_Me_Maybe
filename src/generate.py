@@ -22,6 +22,7 @@ def prompt_builder(func_defs: List[FuncDefValidator], prompt: str) -> str:
         feeding_prompt += f"{func.name}({parameters}): {func.description}\n"
     feeding_prompt += f"\nUser request: {prompt}\n"
     feeding_prompt += '{"function_name": "'
+
     return feeding_prompt
 
 
@@ -89,7 +90,7 @@ def generate_number(llm: Small_LLM_Model,
         curr_ids.append(next_token)
         generated_str += valid_vocab[next_token]
 
-    raise ValueError("Number decoding exceeded token limit")
+    return generated_ids, value
 
 
 def generate_string(llm: Small_LLM_Model,
@@ -100,7 +101,7 @@ def generate_string(llm: Small_LLM_Model,
                     max_tokens: int = 128) -> str:
     """Generate content until the model selects a token containing a quote."""
     generated_ids: List[int] = []
-    allowed_ids = content_ids | quote_ids
+    allowed_ids: set[int] = content_ids.union(quote_ids)
     for _ in range(max_tokens):
         logits = llm.get_logits_from_input_ids(curr_ids)
         token = chose_next_token(logits_masking(logits, allowed_ids))
@@ -113,7 +114,7 @@ def generate_string(llm: Small_LLM_Model,
         curr_ids.append(token)
         generated_ids.append(token)
 
-    raise ValueError("String decoding exceeded token limit")
+    return value + ending
 
 
 def generate_boolean(llm: Small_LLM_Model,
