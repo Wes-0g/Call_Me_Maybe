@@ -13,7 +13,7 @@ import time
 
 def main() -> None:
 
-    start: float = time.perf_counter()
+    start: float = time.time()
 
     arg_parser: ArgumentParser = ArgumentParser(
         description="Function calling assistant."
@@ -51,8 +51,7 @@ def main() -> None:
     output.parent.mkdir(parents=True, exist_ok=True)
     output.write_text(json.dumps(results, indent=4))
 
-    end: float = time.perf_counter()
-    print(f"\ntime: {end - start:.2f}")
+    print(f"\ntime: {time.time() - start:.2f}s")
 
 
 if __name__ == '__main__':
