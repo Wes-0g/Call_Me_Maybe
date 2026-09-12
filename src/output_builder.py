@@ -1,8 +1,14 @@
 from typing import Any, Dict, List
 from llm_sdk import Small_LLM_Model
-from .parser import FuncCallValidator, FuncDefValidator, ParamType, load_vocab
-from .generate import (prompt_builder, generate_func_name, generate_string,
-                       generate_number, generate_boolean)
+from .parser import (FuncCallValidator,
+                     FuncDefValidator,
+                     ParamType,
+                     load_vocab)
+from .generate import (prompt_builder,
+                       generate_func_name,
+                       generate_string,
+                       generate_number,
+                       generate_boolean)
 from .trie import Trie
 from .valid_boolean import build_boolean_trie
 from .valid_number import build_number_vocab
@@ -13,23 +19,23 @@ class FunctionCaller:
     """Keep the model and reusable token pools together."""
 
     def __init__(self, llm: Small_LLM_Model,
-                 functions: list[FuncDefValidator]) -> None:
-        self.llm = llm
-        self.functions = functions
-        self.names = Trie()
+                 functions: List[FuncDefValidator]) -> None:
+        self.llm: Small_LLM_Model = llm
+        self.functions: List[FuncDefValidator] = functions
+        self.names: Trie = Trie()
         self.names.trie_builder(functions, llm)
-        self.booleans = build_boolean_trie(llm)
-        vocab = load_vocab(llm)
-        self.numbers = build_number_vocab(vocab)
+        self.booleans: Trie = build_boolean_trie(llm)
+        vocab: Dict[str, int] = load_vocab(llm)
+        self.numbers: Dict[int, str] = build_number_vocab(vocab)
         self.string_ids, self.quote_ids = split_string_tokens(vocab)
-        self.quote = llm.encode('"')[0].tolist()[0]
-        self.comma = llm.encode(',')[0].tolist()
-        self.closing = llm.encode('}')[0].tolist()
+        self.quote: List[int] = llm.encode('"')[0].tolist()[0]
+        self.comma: List[int] = llm.encode(',')[0].tolist()
+        self.closing: List[int] = llm.encode('}')[0].tolist()
 
-    def generate_params(self, ids: list[int],
-                        function: FuncDefValidator) -> dict[str, Any]:
-        arguments: dict[str, Any] = {}
-        params = list(function.parameters.items())
+    def generate_params(self, ids: List[int],
+                        function: FuncDefValidator) -> Dict[str, Any]:
+        arguments: Dict[str, Any] = {}
+        params: List = list(function.parameters.items())
 
         for index, (name, param) in enumerate(params):
             separator: List[int] = self.comma if (
