@@ -8,7 +8,7 @@ debug:
 		python3 -m pdb main.py
 
 clean:
-	rm -rf __pycache__ */__pycache__
+	find . -type d -name __pycache__ -exec rm -rf {} +
 	rm -rf .mypy_cache */.mypy_cache
 
 lint:
