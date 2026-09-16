@@ -158,15 +158,15 @@ class FuncDefValidator(BaseModel):
         """
         if not self.name.strip():
             raise ValueError("Function name cannot be empty.")
-        if self.name.startswith(tuple([str(x) for x in range(10)])):
-            raise ValueError("Function name cannot start with a number.")
+        if not self.name.isidentifier():
+            raise ValueError("Function name must be an identifier.")
         if not self.description.strip():
             raise ValueError("Function description cannot be empty.")
         for param_name in self.parameters.keys():
             if not param_name.strip():
                 raise ValueError("Parameter name cannot be empty.")
-            if param_name.startswith(tuple([str(x) for x in range(10)])):
-                raise ValueError("Parameter name cannot start with a number.")
+            if not param_name.isidentifier():
+                raise ValueError("Parameter name name must be an identifier.")
         return self
 
 
@@ -290,6 +290,14 @@ class JsonParser:
             raise ParserError("Function definitions file is a directory.")
         except JSONDecodeError:
             raise ParserError("Invalid JSON format.")
+
+        seen: set = set()
+        for func in func_def_json:
+            name = func.get('name')
+            if name in seen:
+                raise ParserError(f"Duplicated Function name '{name}'")
+            seen.add(name)
+
         try:
             return [FuncDefValidator(**item) for item in func_def_json]
         except ValidationError as e:
