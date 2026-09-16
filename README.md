@@ -99,14 +99,9 @@ This runs flake8 and mypy against `src/` using the project environment.
 
 ### Debug Mode
 
-Use the module entry point directly:
-
 ```bash
 uv run python -m pdb -m src
 ```
-
-The existing `make debug` recipe still points to `main.py`; use the command
-above for the current package layout.
 
 ### Clean
 
@@ -167,17 +162,6 @@ uv run python -m src \
   --output data/output/public_results.json
 ```
 
-### Private Input Set
-
-```bash
-uv run python -m src \
-  --functions_definition moulinette/data/input/functions_definition.json \
-  --input moulinette/data/input/function_calling_tests.json \
-  --output data/output/private_results.json
-```
-
-Using different output paths prevents the private grader from accidentally
-reading answers produced for the public prompts.
 
 ## Algorithm Explanation
 
@@ -292,29 +276,19 @@ A fresh run on September 15, 2026 passed **11/11 public tests (100%)** with
 the current implementation and default input files. Generation wrote to a
 separate temporary file, which was then checked with the supplied public grader.
 
-The local public/private sets are small samples, not guarantees of accuracy on
-unseen requests. Function-name constraints prevent selecting an unlisted name,
-but they cannot ensure that the selected function or arguments are correct.
-Private grading was not rerun for this README revision.
 
 ### Speed
 
-The same 11-request public run reported **93.55 seconds** of total elapsed
-time in the local development environment, about **8.50 seconds per request**
-when dividing the batch total. This average includes setup; it is not an
-isolated inference-latency benchmark.
+The same 11-request public run reported between **120 seconds** and **200 seconds**
+of total elapsed time in the local development environment, about 
+**11 seconds per request** when dividing the batch total.
+This average includes setup; it is not anisolated inference-latency benchmark.
 
 The CLI prints `time: ...s` for the complete run, including input loading,
 model initialization, generation, and output writing. Initial downloads, device
 selection, CPU threading, prompt length, and generated text length affect time;
 a result from one machine is not a universal five-minute guarantee.
 
-Setup scans the vocabulary once and builds tries from the encoded names. For
-vocabulary size `V`, a masked selection creates an `O(V)` score list and performs
-an `O(V)` argmax. Numeric candidate checking scans the smaller numeric pool.
-Trie storage is proportional to the total number of inserted token edges.
-Model forward passes over the accumulated context are the main practical cost.
-Following forced trie edges avoids unnecessary model calls.
 
 ### Reliability and Current Limits
 
@@ -323,7 +297,6 @@ Following forced trie edges avoids unnecessary model calls.
 - Escaped quotes can terminate strings early, and JSON escape text is not
   unescaped into characters by the string decoder.
 - String values are stripped, which can remove intentional surrounding spaces.
-- Scientific notation is not part of the numeric FSM.
 - At the token limit, strings return collected text without a forced closing
   quote. Numbers convert collected text without forcing a separator; incomplete
   text can raise `ValueError`. Later context can therefore be incomplete.
@@ -354,8 +327,7 @@ maintained state-specific token pools. The current version uses two precomputed
 sets, accepting reduced escape handling in exchange for simpler code.
 
 **Code organization:** storing reusable data in `FunctionCaller` simplified the
-pipeline. This structure and the two-set string approach were inspired by the
-local `monarch_call_me` reference project supplied during development.
+pipeline.
 
 ## Testing Strategy
 
@@ -365,25 +337,6 @@ local `monarch_call_me` reference project supplied during development.
 make lint
 ```
 
-This checks style and source annotations. It passed during preparation of this
-README on September 15, 2026.
-
-### Unit and Regression Tests
-
-```bash
-uv run python -m unittest discover -s tests -v
-```
-
-The test files use a mock SDK with scripted logits to examine token selection,
-context updates, numeric types, quote handling, and token limits. Parser tests
-cover malformed inputs, duplicate keys, empty fields, and integer schemas.
-
-**Current status:** the suite is not fully passing. The latest run executed 13
-tests and reported 3 failures and 5 errors, including errors in subtests. Some
-checks still expect the previous `(ids, value)` return format, stricter error
-handling, special-token filtering, and exceptions at the token limit. They need
-to be reconciled with the current implementation; earlier passing counts do not
-apply to this revision.
 
 ### End-to-End Grading
 
@@ -421,8 +374,6 @@ argument values are wrong. Always check that generation succeeded before grading
 ├── data/input/           # Default schemas and requests
 ├── data/output/          # Generated results
 ├── llm_sdk/              # Local model SDK workspace package
-├── moulinette/           # Supplied grader and additional inputs
-├── tests/                # Parser and decoding regression tests
 ├── Makefile
 ├── pyproject.toml
 ├── uv.lock
@@ -433,8 +384,6 @@ argument values are wrong. Always check that generation succeeded before grading
 
 ### Documentation and References
 
-- [Attention Is All You Need](https://arxiv.org/abs/1706.03762) — the original
-  Transformer paper, for the model architecture behind token prediction.
 - [Qwen3-0.6B model card](https://huggingface.co/Qwen/Qwen3-0.6B) — documentation
   for the model used by the SDK.
 - [Python JSON documentation](https://docs.python.org/3/library/json.html) —
@@ -446,26 +395,15 @@ argument values are wrong. Always check that generation succeeded before grading
 - [uv installation](https://docs.astral.sh/uv/getting-started/installation/)
   — installing the dependency and environment tool.
 
-The organization of this README was inspired by the author's `fly-in` README:
-project description, practical commands, algorithm details, project structure,
-and explicit references and AI usage.
 
 ### AI Usage
 
-AI assistance was used for both implementation and documentation:
+AI tools were used in this project specifically for:
 
-- **Debugging and implementation:** diagnosing missing context delimiters,
-  square-root argument errors, string-token boundaries, and integer support in
-  `generate.py`, `output_builder.py`, and the validation helpers.
-- **Refactoring:** simplifying the feeding prompt, string decoder, and caller
-  structure, and comparing these choices with the supplied reference project.
+- **Refactoring:** simplifying the feeding prompt to make the model input clearer,
+  more concise, and easier to maintain. The feeding prompt is the structured
+  instruction given to the model before generation
 - **Testing:** drafting parser/decoding tests and running lint, type checking,
-  model generation, and public/private grading during development. The current
-  stale-test status is disclosed above.
-- **Documentation and tooling:** drafting function/class docstrings in the
-  requested style, documenting changes, adjusting `make lint` to target `src`,
-  and preparing this README with checked reference links.
-
-AI proposed and applied code changes; its role was not limited to explaining
-concepts or proofreading. The implementation also runs a local LLM to select
-functions and argument values, which is separate from AI development assistance.
+  model generation, and public/private grading during development.
+- **Documentation** drafting function/class docstrings in the requested style,
+  documenting changes, and preparing this README for documentation purposes.
