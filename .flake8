@@ -1,2 +1,0 @@
-[flake8]
-exclude = llm_sdk, .venv, moulinette
