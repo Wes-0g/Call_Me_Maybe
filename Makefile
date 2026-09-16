@@ -5,7 +5,7 @@ install:
 	uv sync
 
 debug:
-		python3 -m pdb main.py
+	uv run python -m pdb -m src
 
 clean:
 	find . -type d -name __pycache__ -exec rm -rf {} +
@@ -13,10 +13,10 @@ clean:
 
 lint:
 	uv run python -m flake8 src
-	uv run python -m mypy src --warn-return-any \
-		--warn-unused-ignores \
-		--ignore-missing-imports \
-		--disallow-untyped-defs \
-		--check-untyped-defs
+	uv run python -m mypy src 	--warn-return-any \
+					--warn-unused-ignores \
+					--ignore-missing-imports \
+					--disallow-untyped-defs \
+					--check-untyped-defs
 
 .PHONY: run install debug clean lint
