@@ -1,3 +1,5 @@
+"""Run function-call generation from the command line."""
+
 import json
 from argparse import ArgumentParser, Namespace
 from typing import List, Dict, Any
@@ -8,11 +10,26 @@ from .parser import (JsonParser,
                      FuncDefValidator,
                      FuncCallValidator)
 from .output_builder import constrained_decoding
+from sys import exit
 import time
 
 
 def main() -> None:
+    """Parse CLI options, generate function calls, and write the output JSON.
 
+    Create the output directory when needed and print the elapsed time.
+    Exit on an input parsing error; other failures propagate to the caller.
+
+    Args:
+        None.
+
+    Returns:
+        None. Write the output file and print elapsed time.
+
+    Raises:
+        SystemExit: If parsed inputs are invalid.
+        OSError: If the output directory or file cannot be written.
+    """
     start: float = time.time()
 
     arg_parser: ArgumentParser = ArgumentParser(
