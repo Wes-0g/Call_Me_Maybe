@@ -47,6 +47,11 @@ def main() -> None:
         "--output",
         default="data/output/function_calling_results.json",
         help="Path to the output JSON file.")
+    arg_parser.add_argument(
+        "--model",
+        default="Qwen/Qwen3-0.6B",
+        help="Hugging Face model identifier"
+    )
 
     args: Namespace = arg_parser.parse_args()
     json_parser: JsonParser = JsonParser(args)
@@ -58,7 +63,7 @@ def main() -> None:
     except ParserError as e:
         exit(f"{e}")
 
-    llm: Small_LLM_Model = Small_LLM_Model()
+    llm: Small_LLM_Model = Small_LLM_Model(args.model)
 
     results: List[
         Dict[str, Any]
