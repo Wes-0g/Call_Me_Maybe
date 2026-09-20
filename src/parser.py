@@ -144,7 +144,7 @@ class FuncDefValidator(BaseModel):
         """Check function metadata and return the validated model.
 
         Raise ValueError for blank names or descriptions, or for function and
-        parameter names beginning with an ASCII digit.
+        parameter names that is not an identifer.
 
         Args:
             None.
@@ -154,7 +154,7 @@ class FuncDefValidator(BaseModel):
 
         Raises:
             ValueError: If metadata is blank or a function/parameter name
-                starts with an ASCII digit.
+                is not an identifer.
         """
         if not self.name.strip():
             raise ValueError("Function name cannot be empty.")
