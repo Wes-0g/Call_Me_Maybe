@@ -1,4 +1,4 @@
-"""Run function-call generation from the command line."""
+"""Run function-call generation from the CLI"""
 
 import json
 from argparse import ArgumentParser, Namespace
