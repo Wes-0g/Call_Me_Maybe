@@ -12,7 +12,7 @@ try:
                           ValidationError,
                           ConfigDict)
 except ModuleNotFoundError:
-    print("llm_sdk or pydantic is not installed, install them first.")
+    print("llm_sdk or pydantic is not installed, install them first to run the program.")
     exit(1)
 
 
